@@ -19,6 +19,7 @@ title: Egg@2 升级指南
 Egg 的理念之一是`渐进式增强`，故我们为开发者提供`渐进升级`的体验。
 
 - [快速升级](#快速升级)
+- [插件变更说明](#插件变更说明)
 - [进一步升级](#进一步升级)
 - [针对`插件开发者`的升级指南](#插件升级)
 
@@ -29,7 +30,52 @@ Egg 的理念之一是`渐进式增强`，故我们为开发者提供`渐进升�
 - 检查相关插件是否发布新版本（可选）。
 - 重新安装依赖，跑单元测试。
 
-**搞定！不需要修改任何一行代码，就已经完成了升级。**
+**搞定！几乎不需要修改任何一行代码，就已经完成了升级。**
+
+
+## 插件变更说明
+
+### egg-multipart
+
+`yield parts` 需修改为 `await parts()` 或 `yield parts()`
+
+```js
+// old
+const parts = ctx.multipart();
+while ((part = yield parts) != null) {
+  // do something
+}
+
+// yield parts() also work
+while ((part = yield parts()) != null) {
+  // do something
+}
+
+// new
+const parts = ctx.multipart();
+while ((part = await parts()) != null) {
+  // do something
+}
+```
+
+- [egg-multipart#upload-multiple-files](https://github.com/eggjs/egg-multipart#upload-multiple-files)
+
+### egg-userrole
+
+不再兼容 1.x 形式的 role 定义，因为 koa-roles 已经无法兼容了，入参需改为 ctx
+
+```js
+// old
+app.role.use('user', function() {
+  return !!this.user;
+});
+
+// new
+app.role.use('user', ctx => !!ctx.user);
+```
+
+- [koajs/koa-roles#13](https://github.com/koajs/koa-roles/pull/13)
+- [eggjs/egg-userrole#9](https://github.com/eggjs/egg-userrole/pull/9)
 
 ## 进一步升级
 
